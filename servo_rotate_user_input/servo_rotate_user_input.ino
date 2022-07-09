@@ -1,23 +1,22 @@
 #include <Servo.h>
 
-Servo myservo;
+Servo myservo;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+
+int pos = 0;    // variable to store the servo position
 
 void setup() {
-  Serial.begin(9600);
-  myservo.attach(12);
+  myservo.attach(12);  // attaches the servo on pin 9 to the servo object
 }
 
 void loop() {
-  int pos = 0;
-  myservo.write(pos);
-  delay(1000);
-  Serial.println("Enter Rotate Angle: ");
-  while(Serial.available() == 0) {
+  for (pos = 25; pos <= 160; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
   }
-  pos = Serial.parseInt();
-  myservo.write(pos);
-  delay(1000);
-  Serial.println("Entered Angle: ");
-  delay(1000);
-  Serial.println(myservo.read());
+  for (pos = 150; pos >= 25; pos -= 1) { // goes from 180 degrees to 0 degrees
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
 }

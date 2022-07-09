@@ -10,9 +10,9 @@
 #define s2 5
 #define s3 6
 #define out 2
-Servo myservo;
-int data=0;        //This is where we're going to stock our values
+Servo top_servo, bottom_servo;
 
+int data=0;        //This is where we're going to stock our values
 int r, g, b;
 
 void setup() 
@@ -22,8 +22,8 @@ void setup()
    pinMode(s2,OUTPUT);
    pinMode(s3,OUTPUT);
    pinMode(out,INPUT);
-   myservo.attach(9);
-   
+   top_servo.attach(12);
+   bottom_servo.attach(10);   
    Serial.begin(9600);   //intialize the serial monitor baud rate
    
    digitalWrite(s0,HIGH); //Putting S0/S1 on HIGH/HIGH levels means the output frequency scalling is at 100% (recommended)
@@ -31,48 +31,74 @@ void setup()
    
 }
 
+void servo_rotate(int pos) {
+  int cur = bottom_servo.read();
+  while(bottom_servo.read() != pos) {
+    if(cur < pos) {
+      cur++;
+    } else if(cur > pos) {
+      cur--;
+    }
+    bottom_servo.write(cur);
+    delay(15);
+  }
+}
 void red() {
-  myservo.write(35);
+//  bottom_servo.write(60);
+  servo_rotate(45);
 }
 void green() {
-  myservo.write(90);
+//  bottom_servo.write(90);
+  servo_rotate(80);
 }
 void blue() {
-  myservo.write(170);
+//  bottom_servo.write(110);
+  servo_rotate(120);
 }
 
 void loop()                  //Every 2s we select a photodiodes set and read its data
 {
-
-   digitalWrite(s2,LOW);        //S2/S3 levels define which set of photodiodes we are using LOW/LOW is for RED LOW/HIGH is for Blue and HIGH/HIGH is for green
-   digitalWrite(s3,LOW);
-   Serial.print("Red value= "); 
-   r = GetData();                   //Executing GetData function to get the value
-
-   digitalWrite(s2,LOW);
-   digitalWrite(s3,HIGH);
-   Serial.print("Blue value= ");
-   b = GetData();
-
-   digitalWrite(s2,HIGH);
-   digitalWrite(s3,HIGH);
-   Serial.print("Green value= ");
-   g = GetData();
+   top_servo.write(0);
+   delay(5000);
+   top_servo.write(45);
+   delay(5000);
    
-   Serial.println();
-   digitalWrite(s0,LOW);
-   digitalWrite(s1,LOW);
+   for(int i = 0; i < 5; ++i) {
+    digitalWrite(s2,LOW);        //S2/S3 levels define which set of photodiodes we are using LOW/LOW is for RED LOW/HIGH is for Blue and HIGH/HIGH is for green
+    digitalWrite(s3,LOW);
+    Serial.print("Red value= "); 
+    r = GetData();                   //Executing GetData function to get the value
+
+    digitalWrite(s2,LOW);
+    digitalWrite(s3,HIGH);
+    Serial.print("Blue value= ");
+    b = GetData();
+
+    digitalWrite(s2,HIGH);
+    digitalWrite(s3,HIGH);
+    Serial.print("Green value= ");
+    g = GetData();
+   
+    Serial.println();
+//    digitalWrite(s0,LOW);
+//    digitalWrite(s1,LOW);
+    digitalWrite(s0,HIGH);
+    digitalWrite(s1,HIGH);
+   }
+   Serial.println("");
    
    if(r < g and r < b) red();
    else if(g < r and g < b) green();
    else if(b < r and b < g) blue();
-   
    delay(2000);
-   myservo.write(0);
+   
+   top_servo.write(90);
    delay(1000);
    
-   digitalWrite(s0,HIGH);
-   digitalWrite(s1,HIGH);
+//   myservo.write(0);
+//   delay(1000);
+   
+   
 }
 
 int GetData(){
