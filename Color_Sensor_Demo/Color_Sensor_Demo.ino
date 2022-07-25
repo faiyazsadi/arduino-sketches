@@ -31,6 +31,18 @@ void setup()
    
 }
 
+void top_servo_rotate(int pos) {
+  int cur = top_servo.read();
+  while(top_servo.read() != pos) {
+    if(cur < pos) {
+      cur++;
+    } else if(cur > pos) {
+      cur--;
+    }
+    top_servo.write(cur);
+    delay(10);
+  }
+}
 void servo_rotate(int pos) {
   int cur = bottom_servo.read();
   while(bottom_servo.read() != pos) {
@@ -45,23 +57,28 @@ void servo_rotate(int pos) {
 }
 void red() {
 //  bottom_servo.write(60);
-  servo_rotate(45);
+  servo_rotate(25);
 }
 void green() {
 //  bottom_servo.write(90);
-  servo_rotate(80);
+  servo_rotate(60);
 }
 void blue() {
 //  bottom_servo.write(110);
-  servo_rotate(120);
+  servo_rotate(95);
 }
-
+void black() {
+  servo_rotate(130);
+}
+void others(){
+  servo_rotate(160);}
 void loop()                  //Every 2s we select a photodiodes set and read its data
 {
    top_servo.write(0);
-   delay(5000);
-   top_servo.write(45);
-   delay(5000);
+   delay(3000);
+//   top_servo.write(40);
+   top_servo_rotate(40);
+   delay(2000);
    
    for(int i = 0; i < 5; ++i) {
     digitalWrite(s2,LOW);        //S2/S3 levels define which set of photodiodes we are using LOW/LOW is for RED LOW/HIGH is for Blue and HIGH/HIGH is for green
@@ -87,12 +104,19 @@ void loop()                  //Every 2s we select a photodiodes set and read its
    }
    Serial.println("");
    
-   if(r < g and r < b) red();
+   if(r < g and r < b)
+   {if(g<b)others();
+   else red();}
    else if(g < r and g < b) green();
-   else if(b < r and b < g) blue();
+   else if(b < r and b < g and b <= 16)
+   {if(g<r)blue();
+   else others();}
+   else if(b < r and b < g and b >= 18) black();
+   else if(r < g and r < b and g<b) others(); //yellow
+
    delay(2000);
-   
-   top_servo.write(90);
+//   top_servo.write(90);
+   top_servo_rotate(90);
    delay(1000);
    
 //   myservo.write(0);
